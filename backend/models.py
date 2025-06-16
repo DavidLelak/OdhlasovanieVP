@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
@@ -7,21 +8,16 @@ class Operation(db.Model):
     worker_id = db.Column(db.String(50), nullable=False)
     order_number = db.Column(db.String(50), nullable=False)
     start_time = db.Column(db.DateTime, nullable=False)
-    end_time = db.Column(db.DateTime, nullable=True)
+    end_time = db.Column(db.DateTime)
 
     def to_dict(self):
         return {
             "id": self.id,
             "worker_id": self.worker_id,
             "order_number": self.order_number,
-            "start_time": self.start_time.strftime("%Y-%m-%d %H:%M:%S"),
-            "end_time": self.end_time.strftime("%Y-%m-%d %H:%M:%S") if self.end_time else None
+            "start_time": self.start_time.isoformat(),
+            "end_time": self.end_time.isoformat() if self.end_time else None
         }
-
-def init_db():
-    db.create_all()
-
-from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)

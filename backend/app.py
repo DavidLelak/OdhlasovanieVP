@@ -1,46 +1,49 @@
-from flask import Flask, request, jsonify
-from models import db, init_db, Operation
+from flask import Flask, request, jsonify, Response
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+import csv
+from io import StringIO
+from models import db, Operation, User
 from auth import auth_required
 from utils import get_current_user
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
-@app.route('/start', methods=['POST'])
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
+@app.route('/operations/start', methods=['POST'])
 @auth_required
 def start_operation():
     data = request.json
     op = Operation(
         worker_id=data['worker_id'],
         order_number=data['order_number'],
-        start_time=db.func.current_timestamp()
+        start_time=datetime.now()
     )
     db.session.add(op)
     db.session.commit()
-    return jsonify({"status": "started", "id": op.id})
+    return jsonify(op.to_dict()), 201
 
-@app.route('/stop/<int:op_id>', methods=['POST'])
+@app.route('/operations/stop/<int:op_id>', methods=['POST'])
 @auth_required
 def stop_operation(op_id):
-    op = Operation.query.get(op_id)
-    if op and not op.end_time:
-        op.end_time = db.func.current_timestamp()
-        db.session.commit()
-        return jsonify({"status": "stopped", "id": op.id})
-    return jsonify({"error": "Invalid operation ID or already stopped"}), 400
+    op = Operation.query.get_or_404(op_id)
+    op.end_time = datetime.now()
+    db.session.commit()
+    return jsonify(op.to_dict())
 
 @app.route('/operations', methods=['GET'])
 @auth_required
 def list_operations():
     user = get_current_user()
     ops = Operation.query
-
     if not user['is_admin']:
         ops = ops.filter_by(worker_id=user['username'])
-
-    # Filter podľa dátumu
     date_from = request.args.get('from')
     date_to = request.args.get('to')
     if date_from:
@@ -49,31 +52,15 @@ def list_operations():
     if date_to:
         to_dt = datetime.strptime(date_to, "%Y-%m-%d")
         ops = ops.filter(Operation.start_time <= to_dt)
-
     return jsonify([op.to_dict() for op in ops.all()])
-
-
-if __name__ == '__main__':
-    with app.app_context():
-        init_db()
-    app.run(debug=True)
-
-import csv
-from io import StringIO
-from flask import Response
-from datetime import datetime
-
 
 @app.route('/export', methods=['GET'])
 @auth_required
 def export_operations():
     user = get_current_user()
     ops = Operation.query
-
     if not user['is_admin']:
         ops = ops.filter_by(worker_id=user['username'])
-
-    # Filtrovanie podľa dátumu
     date_from = request.args.get('from')
     date_to = request.args.get('to')
     if date_from:
@@ -82,8 +69,6 @@ def export_operations():
     if date_to:
         to_dt = datetime.strptime(date_to, "%Y-%m-%d")
         ops = ops.filter(Operation.start_time <= to_dt)
-
-    # Vytvorenie CSV
     si = StringIO()
     cw = csv.writer(si)
     cw.writerow(["ID", "Worker ID", "Order Number", "Start Time", "End Time"])
@@ -95,7 +80,6 @@ def export_operations():
             op.start_time.strftime("%Y-%m-%d %H:%M:%S"),
             op.end_time.strftime("%Y-%m-%d %H:%M:%S") if op.end_time else ""
         ])
-
     return Response(
         si.getvalue(),
         mimetype="text/csv",
@@ -105,7 +89,6 @@ def export_operations():
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json
-    from models import User
     if User.query.filter_by(username=data['username']).first():
         return jsonify({"error": "User already exists"}), 400
     new_user = User(username=data['username'], is_admin=data.get('is_admin', False))
@@ -113,3 +96,6 @@ def register():
     db.session.add(new_user)
     db.session.commit()
     return jsonify({"status": "user created"})
+
+if __name__ == '__main__':
+    app.run(debug=True)
