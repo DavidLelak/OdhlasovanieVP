@@ -6,6 +6,7 @@ from io import StringIO
 from models import db, Operation, User
 from auth import auth_required
 from utils import get_current_user
+from fastapi.responses import FileResponse
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
@@ -99,3 +100,8 @@ def register():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+# pridanie cesty pre favicon
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return FileResponse("static/favicon.ico")

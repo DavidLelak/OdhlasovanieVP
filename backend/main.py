@@ -4,6 +4,7 @@ from backend.auth import get_current_user, router as auth_router
 from backend.db import init_db, get_operations, create_operation, stop_operation, export_operations
 from fastapi.responses import FileResponse
 from datetime import datetime
+from fastapi.staticfiles import StaticFiles
 import os
 
 app = FastAPI(title="Výrobné operácie")
@@ -50,3 +51,6 @@ def export_to_csv(worker_id: str = None, order_number: str = None, user=Depends(
         worker_id = user["username"]
     csv_file = export_operations(worker_id, order_number)
     return FileResponse(csv_file, filename=os.path.basename(csv_file), media_type='text/csv')
+
+# Sprístupnenie adresára pre FastAPI
+app.mount("/static", StaticFiles(directory="static"), name="static")
