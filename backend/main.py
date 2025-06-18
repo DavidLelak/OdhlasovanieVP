@@ -7,6 +7,12 @@ from typing import Optional
 import sqlite3
 import csv
 import io
+
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+import auth
+
 from auth import get_current_user, authenticate_user, create_access_token, UserOut
 from db import init_db
 
