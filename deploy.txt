@@ -1,0 +1,68 @@
+✅ 1. Požiadavky
+Python 3.9+
+pip
+SQLite (súčasť Pythonu)
+Voliteľne: Git, virtualenv
+
+📁 2. Štruktúra projektu
+projekt/
+├── backend/
+│   ├── main.py
+│   ├── auth.py
+│   ├── db.py
+│   └── requirements.txt
+├── frontend/
+│   ├── index.html
+│   ├── script.js
+│   └── style.css
+├── database/
+│   └── init.sql
+└── data.db   ← voliteľné, alebo sa vygeneruje
+
+⚙️ 3. Inštalácia a spustenie backendu
+1. Vytvor a aktivuj prostredie (voliteľné):
+bash
+python -m venv venv
+source venv/bin/activate  # Windows: venv\\Scripts\\activate
+
+2. Nainštaluj požiadavky:
+bash
+cd backend
+pip install -r requirements.txt
+
+3. Vytvor databázu (ak ešte nemáš data.db):
+bash
+sqlite3 ../data.db < ../database/init.sql
+
+4. Spusti backend server:
+bash
+uvicorn main:app --reload
+
+🌐 4. Spustenie frontend rozhrania
+1. Otvor súbor frontend/index.html v prehliadači.
+2. Backend beží na http://127.0.0.1:8000, frontend ho používa automaticky.
+
+🔐 5. Prihlasovanie
+Admin účet:
+Používateľ: admin
+Heslo: admin
+
+📦 6. Export a filtrovanie
+Používateľ môže filtrovať záznamy podľa dátumu (od / do) a exportovať ich do CSV.
+Export funguje z UI (cez tlačidlo Export CSV).
+
+🌍 7. Nasadenie na server (napr. Ubuntu VPS)
+1. Nahraj projekt (napr. cez Git alebo ZIP).
+2. Uisti sa, že máš Python a pip:
+bash
+sudo apt update && sudo apt install python3-pip
+3. Nainštaluj požiadavky a backend spusti cez uvicorn alebo systémový správca ako systemd alebo gunicorn.
+4. Na frontend môžeš použiť jednoduchý HTTP server:
+bash
+cd frontend
+python -m http.server 8080
+5. Alebo to nasmeruj cez Nginx ako reverzný proxy.
+
+🧪 8. Testovanie a ladenie
+Po spustení môžeš testovať REST API aj cez nástroj http://127.0.0.1:8000/docs (Swagger UI).
+Odtiaľ vieš otestovať login, štart/stop operácie a export.
