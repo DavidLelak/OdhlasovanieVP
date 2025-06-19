@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <title>Správa používateľov</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        .user-card { border: 1px solid #ccc; padding: 1em; margin-bottom: 1em; border-radius: 4px; }
+        .actions button { margin-right: 0.5em; }
+        .form-group { margin-bottom: 1em; }
+    </style>
+</head>
+<body>
+    <h1>Administrácia používateľov</h1>
+
+    <div>
+        <h2>Pridať používateľa</h2>
+        <div class="form-group">
+            <input type="text" id="username" placeholder="Používateľské meno">
+        </div>
+        <div class="form-group">
+            <input type="password" id="password" placeholder="Heslo">
+        </div>
+        <div class="form-group">
+            <select id="role">
+                <option value="user">Používateľ</option>
+                <option value="admin">Administrátor</option>
+            </select>
+        </div>
+        <button onclick="addUser()">Pridať</button>
+    </div>
+
+    <hr>
+    <h2>Existujúci používatelia</h2>
+    <div id="users"></div>
+
+    <script>
+        const token = localStorage.getItem("token");
+
+        async function fetchUsers() {
+            const res = await fetch("/api/users", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            const users = await res.json();
+
+            const usersDiv = document.getElementById("users");
+            usersDiv.innerHTML = "";
+
+            users.forEach(user => {
+                const div = document.createElement("div");
+                div.className = "user-card";
+                div.innerHTML = `
+                    <strong>${user.username}</strong> (${user.role})<br>
+                    Stav: ${user.is_active ? "Aktívny" : "Neaktívny"}<br>
+                    <div class="actions">
+                        <button onclick="toggleUser(${user.id}, ${user.is_active})">
+                            ${user.is_active ? "Deaktivovať" : "Aktivovať"}
+                        </button>
+                        <button onclick="deleteUser(${user.id})">Zmazať</button>
+                    </div>
+                `;
+                usersDiv.appendChild(div);
+            });
+        }
+
+        async function addUser() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const role = document.getElementById("role").value;
+
+            await fetch("/api/users", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ username, password, role })
+            });
+
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+            fetchUsers();
+        }
+
+        async function toggleUser(id, currentStatus) {
+            await fetch(`/api/users/${id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ is_active: !currentStatus })
+            });
+            fetchUsers();
+        }
+
+        async function deleteUser(id) {
+            await fetch(`/api/users/${id}`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            fetchUsers();
+        }
+
+        fetchUsers();
+    </script>
+</body>
+</html>

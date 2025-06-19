@@ -2,6 +2,11 @@ import sqlite3
 from datetime import datetime
 import csv
 import os
+from sqlalchemy import Boolean
+from sqlalchemy.orm import declarative_base
+
+Base = declarative_base()
+
 
 DB_FILE = "data.db"
 
@@ -72,3 +77,44 @@ def export_operations(worker_id=None, order_number=None):
         writer.writeheader()
         writer.writerows(operations)
     return filename
+
+# Uprav model používateľa:
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    role = Column(String, default="user")
+    is_active = Column(Boolean, default=True)
+
+# Získať všetkých používateľov
+def get_all_users(db: Session):
+    return db.query(User).all()
+
+# Pridať používateľa
+def create_user(db: Session, username: str, password: str, role: str = "user"):
+    hashed_password = hash_password(password)
+    user = User(username=username, hashed_password=hashed_password, role=role)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+# Vymazať používateľa
+def delete_user(db: Session, user_id: int):
+    user = db.query(User).filter(User.id == user_id).first()
+    if user:
+        db.delete(user)
+        db.commit()
+        return True
+    return False
+
+# Aktivácia/deaktivácia používateľa
+def set_user_active_status(db: Session, user_id: int, is_active: bool):
+    user = db.query(User).filter(User.id == user_id).first()
+    if user:
+        user.is_active = is_active
+        db.commit()
+        db.refresh(user)
+        return user
+    return None
