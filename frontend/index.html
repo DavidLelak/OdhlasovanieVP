@@ -1,43 +1,11 @@
 <!DOCTYPE html>
 <html lang="sk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Výrobné operácie</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>React UI – Výrobné operácie</title>
 </head>
 <body>
-    <h1>Výrobné operácie</h1>
-    <form id="login-form">
-        <input type="text" id="username" placeholder="Používateľské meno" required>
-        <input type="password" id="password" placeholder="Heslo" required>
-        <button type="submit">Prihlásiť</button>
-    </form>
-    <div id="main" style="display:none;">
-        <input type="text" id="worker_id" placeholder="ID pracovníka">
-        <input type="text" id="order_number" placeholder="Výrobný príkaz">
-        <button onclick="startOperation()">START</button>
-        <div id="active-ops"></div>
-        <h2>Filtrovanie</h2>
-        <input type="date" id="filter_from">
-        <input type="date" id="filter_to">
-        <button onclick="loadOperations()">Filtrovať</button>
-        <button onclick="exportCSV()">Export CSV</button>
-        <h2>Záznamy</h2>
-        <table id="operation-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Pracovník</th>
-                    <th>Príkaz</th>
-                    <th>Začiatok</th>
-                    <th>Koniec</th>
-                    <th>Akcia</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-    <script src="script.js"></script>
+  <div id="root"></div>
+  <script src="./build/admin_user_ui.js"></script>
 </body>
 </html>

@@ -1,55 +1,73 @@
-# 🕒 Odhlasovanie výrobných operácií
+# Aplikácia na sledovanie výrobných operácií
 
-Webová aplikácia na sledovanie času výrobných operácií, s podporou viacerých používateľov, autentifikáciou, exportom do CSV a administračným rozhraním.
+Táto aplikácia je postavená na FastAPI a slúži na zaznamenávanie začiatku a konca výrobných operácií.
 
----
+## 🛠️ Požiadavky
 
-## 📦 Zložky projektu
-
-backend/ # API v Pythone (FastAPI)
-frontend/ # Webové rozhranie (HTML/JS/CSS)
-data.db # SQLite databáza
-README.md # Tento popis
-
-
----
-
-## 🚀 Spustenie backendu
-
-### Požiadavky
 - Python 3.8+
-- FastAPI
-- Uvicorn
-- SQLite (súčasť Pythonu)
-  
-### Inštalácia knižníc
+- Balíky z `requirements.txt`
+
+## 📦 Inštalácia
+
+1. Naklonuj repozitár alebo rozbaľ ZIP:
+    ```bash
+    unzip final_project_fastapi.zip
+    cd final_project
+    ```
+
+2. Vytvor virtuálne prostredie a aktivuj ho:
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # Windows: venv\Scripts\activate
+    ```
+
+3. Nainštaluj závislosti:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+## 🚀 Spustenie aplikácie
+
 ```bash
-pip install fastapi uvicorn python-multipart
+uvicorn main:app --reload
+```
 
-🚀 Spustenie
-uvicorn backend.main:app --reload
-Aplikácia pobeží na: http://localhost:8000
+Aplikácia bude bežať na: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
-👥 Používateľské účty
-Admin: admin / admin
-Bežní používatelia sa pridávajú do tabuľky users v databáze.
+## 🔐 Autentifikácia
 
-📤 Export a filtrovanie
-Koncový bod /records umožňuje filtrovanie podľa dátumu (start_date, end_date)
-Koncový bod /export vracia CSV
+- Podporované sú tokeny:
+  - `admin`
+  - `user`
 
-🧪 Testovanie API
-Môžeš testovať cez Swagger rozhranie:
-http://localhost:8000/docs
+Príklad použitia:
+- Pri volaní chránených endpointov nastav v hlavičke:
+  ```
+  Authorization: Bearer admin
+  ```
 
-📱 Frontend
-Zložka frontend/ obsahuje HTML stránku s podporou mobilných zariadení.
-Pre zjednodušenie môžeš otvoriť frontend/index.html priamo v prehliadači.
+## 📋 API Endpointy
 
-🔒 Bezpečnosť
-Tento projekt používa jednoduchú autentifikáciu pre demonštračné účely. V reálnom nasadení odporúčame:
-Používať hashovanie hesiel (napr. bcrypt)
-Zabezpečené spojenie cez HTTPS
-Overovanie tokenov s expiráciou
+| Metóda | Cesta     | Popis                          |
+|--------|-----------|--------------------------------|
+| POST   | /start    | Spustenie operácie             |
+| POST   | /stop     | Ukončenie operácie             |
+| GET    | /admin    | Admin HTML rozhranie           |
 
----
+## 🗃️ Databáza
+
+Používa sa SQLite súbor `app.db`. Záznamy o operáciách sa ukladajú do tabuľky `operations`.
+
+## 📁 Štruktúra projektu
+
+```
+main.py
+auth.py
+sqlite_utils.py
+db.py
+requirements.txt
+```
+
+## 📄 Licencia
+
+Projekt je voľne použiteľný na interné účely.

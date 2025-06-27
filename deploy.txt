@@ -6,18 +6,18 @@ Voliteľne: Git, virtualenv
 
 📁 2. Štruktúra projektu
 projekt/
-├── backend/
-│   ├── main.py
-│   ├── auth.py
-│   ├── db.py
-│   └── requirements.txt
-├── frontend/
-│   ├── index.html
-│   ├── script.js
-│   └── style.css
-├── database/
-│   └── init.sql
-└── data.db   ← voliteľné, alebo sa vygeneruje
+├ backend/
+│ ├ main.py
+│ ├ auth.py
+│ ├ db.py
+│ └ requirements.txt
+├ frontend/
+│ ├ index.html
+│ ├ script.js
+│ └ style.css
+├ database/
+│ └ init.sql
+└ data.db   ← voliteľné, alebo sa vygeneruje
 
 ⚙️ 3. Inštalácia a spustenie backendu
 1. Vytvor a aktivuj prostredie (voliteľné):

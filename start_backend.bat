@@ -1,13 +1,13 @@
 @echo off
-REM Aktivácia virtuálneho prostredia (ak existuje)
+REM Aktivácia virtuálneho prostredia, ak existuje
 IF EXIST venv\Scripts\activate.bat (
     call venv\Scripts\activate.bat
 ) ELSE (
-    echo [INFO] Virtuálne prostredie 'venv' neexistuje. Spúšťam bez aktivácie.
+    echo [INFO] Virtuálne prostredie neexistuje. Spúšťam bez aktivácie.
 )
 
-REM Spustenie backendu
-echo [INFO] Spúšťam FastAPI cez Uvicorn...
-python -m uvicorn backend.main:app --reload
+REM Spustenie FastAPI aplikácie cez Uvicorn z priečinka backend/
+echo [INFO] Spúšťam backend z backend/main.py ...
+uvicorn backend.main:app --reload
 
 pause

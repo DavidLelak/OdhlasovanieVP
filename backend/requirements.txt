@@ -1,6 +1,6 @@
-flask
-flask_sqlalchemy
-werkzeug
 fastapi
 uvicorn
+sqlalchemy
+pydantic
 python-multipart
+werkzeug
