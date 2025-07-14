@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from .auth import get_current_user
-from .sqlite_utils import init_sqlite_db, create_operation, stop_operation
+from backend.auth import get_current_user
+from backend.sqlite_utils import init_sqlite_db, create_operation, stop_operation
 from pydantic import BaseModel
 
 app = FastAPI(title="Výrobné operácie")
@@ -40,3 +40,7 @@ def stop(data: OperationStop, user=Depends(get_current_user)):
 @app.get("/admin", response_class=FileResponse)
 def admin_page():
     return FileResponse("static/admin.html", media_type="text/html")
+
+@app.get("/api/users")
+def get_users():
+    return [{"id": 1, "username": "admin", "role": "admin", "is_active": True}]
